@@ -1,20 +1,20 @@
-import { IsString, IsNumber } from 'class-validator';
+import { IsString, IsNumber, IsOptional } from 'class-validator';
 
 export class CreateStoreDto {
   @IsString()
   name: string;
 
+  @IsOptional()
   @IsString()
-  address: string;
+  street?: string;
 
+  @IsOptional()
   @IsString()
-  street: string;
+  ward?: string;
 
+  @IsOptional()
   @IsString()
-  ward: string;
-
-  @IsString()
-  city: string;
+  city?: string;
 
   @IsNumber()
   latitude: number;

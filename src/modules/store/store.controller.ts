@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards, Param } from '@nestjs/common';
 import { CreateStoreDto } from './dto/create-store.dto';
 import { GetNearbyDto } from './dto/get-nearby.dto';
 import { StoreService } from './store.service';
@@ -35,5 +35,11 @@ export class StoreController {
   @Get()
   async findAll() {
     return this.storeService.findAll();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  async findById(@Param('id') id: string) {
+    return this.storeService.getById(id);
   }
 }

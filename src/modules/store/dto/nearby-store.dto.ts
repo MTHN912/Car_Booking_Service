@@ -1,7 +1,7 @@
 import { Expose, Exclude } from 'class-transformer';
 
 export class NearbyStoreDto {
-  @Exclude()
+  @Expose()
   id: string;
 
   @Expose()

@@ -70,7 +70,7 @@ model Service {
   price       Float?    @map("price")
   duration    Int?      @map("duration")
 
-  bookings    Booking[]
+  bookings    BookingService[]
 
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
@@ -79,25 +79,44 @@ model Service {
 }
 
 model Booking {
-  id          String        @id @default(cuid()) @map("booking_id")
-  user        User          @relation(fields: [userId], references: [id])
-  userId      String        @map("user_id")
-  store       Store         @relation(fields: [storeId], references: [id])
-  storeId     String        @map("store_id")
-  service     Service?      @relation(fields: [serviceId], references: [id])
-  serviceId   String?       @map("service_id")
+  id            String          @id @default(cuid()) @map("booking_id")
+  user          User?           @relation(fields: [userId], references: [id])
+  userId        String?         @map("user_id")
+  store         Store           @relation(fields: [storeId], references: [id])
+  storeId       String          @map("store_id")
+  name          String          @map("name")
+  phone         String          @map("phone")
+  email         String          @map("email")
+  carModel      String          @map("car_model")
+  km            Int?            @map("km")
+  licensePlate  String          @map("license_plate")
+  services      BookingService[]
+  province      String          @map("province")
+  district      String          @map("district")
+  locationType  String          @map("location_type") // workshop | mobile
+  scheduledAt   DateTime        @map("scheduled_at")
+  notes         String?         @map("notes")
 
-  status      BookingStatus @default(PENDING) @map("status")
-  scheduledAt DateTime      @map("scheduled_at")
-  notes       String?       @map("notes")
+  status        BookingStatus   @default(PENDING) @map("status")
 
-  createdAt   DateTime      @default(now()) @map("created_at")
-  updatedAt   DateTime      @updatedAt @map("updated_at")
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
 
   @@index([userId])
   @@index([storeId])
   @@index([scheduledAt])
   @@map("bookings")
+}
+
+model BookingService {
+  booking   Booking @relation(fields: [bookingId], references: [id])
+  bookingId String  @map("booking_id")
+
+  service   Service @relation(fields: [serviceId], references: [id])
+  serviceId String  @map("service_id")
+
+  @@id([bookingId, serviceId])
+  @@map("booking_services")
 }
 
 model AuditLog {
