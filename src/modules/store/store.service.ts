@@ -10,11 +10,25 @@ import { StoreListDto } from './dto/store-list.dto';
 export class StoreService {
   constructor(private readonly storeRepo: StoreRepository) {}
 
-  async create(dto: CreateStoreDto) {
-    return this.storeRepo.create({
-        ...dto,
+  async create(dto: CreateStoreDto): Promise<StoreListDto> {
+    const { name, street, ward, city, latitude, longitude } = dto;
+
+    const address = [street, ward, city].filter(Boolean).join(', ');
+
+    const store = await this.storeRepo.create({
+      name,
+      street: street ?? null,
+      ward: ward ?? null,
+      city: city ?? null,
+      latitude,
+      longitude,
+      address,
     });
-}
+
+    return plainToInstance(StoreListDto, store, {
+      excludeExtraneousValues: true,
+    });
+  }
 
   async findNearby(query: GetNearbyDto) {
     const { latitude, longitude, radius } = query;
@@ -36,7 +50,18 @@ export class StoreService {
   async findAll() {
     const stores = await this.storeRepo.findAll();
       return plainToInstance(StoreListDto, stores, {
-        excludeExtraneousValues: true,
+      excludeExtraneousValues: true,
+    });
+  }
+
+  async getById(id: string): Promise<StoreListDto> {
+    const store = await this.storeRepo.findById(id);
+    if (!store) {
+      throw new Error('Store not found');
+    }
+
+    return plainToInstance(StoreListDto, store, {
+      excludeExtraneousValues: true,
     });
   }
 }
