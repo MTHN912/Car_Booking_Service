@@ -1,29 +1,33 @@
 import { Injectable } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
-import { CreateStoreDto } from './dto/create-store.dto';
-import { GetNearbyDto } from './dto/get-nearby.dto';
-import { NearbyStoreDto } from './dto/nearby-store.dto';
+import { CreateStoreDto } from './dto/input/create-store.dto';
+import { GetNearbyDto } from './dto/input/get-nearby.dto';
+import { UpsertStoreServicesDto } from './dto/input/upsert-store_service.dto';
+import { NearbyStoreDto } from './dto/response/nearby-store.dto';
+import { StoreListDto } from './dto/response/store-list.dto';
+import { StoreServiceDto, StoreWithServicesDto } from './dto/response/upsert-store-response.dto';
 import { StoreRepository } from './store.repository';
-import { StoreListDto } from './dto/store-list.dto';
-
 @Injectable()
 export class StoreService {
   constructor(private readonly storeRepo: StoreRepository) {}
 
   async create(dto: CreateStoreDto): Promise<StoreListDto> {
-    const { name, street, ward, city, latitude, longitude } = dto;
+    const { name, street, ward, city, latitude, longitude, services } = dto;
 
     const address = [street, ward, city].filter(Boolean).join(', ');
 
-    const store = await this.storeRepo.create({
-      name,
-      street: street ?? null,
-      ward: ward ?? null,
-      city: city ?? null,
-      latitude,
-      longitude,
-      address,
-    });
+    const store = await this.storeRepo.createWithServices(
+      {
+        name,
+        street: street ?? null,
+        ward: ward ?? null,
+        city: city ?? null,
+        latitude,
+        longitude,
+        address,
+      },
+      services,
+    );
 
     return plainToInstance(StoreListDto, store, {
       excludeExtraneousValues: true,
@@ -61,6 +65,24 @@ export class StoreService {
     }
 
     return plainToInstance(StoreListDto, store, {
+      excludeExtraneousValues: true,
+    });
+  }
+
+  async upsertServices(dto: UpsertStoreServicesDto): Promise<StoreWithServicesDto> {
+    const { storeId, services } = dto;
+
+    const store = await this.storeRepo.upsertServicesForStore(storeId, services);
+
+    return plainToInstance(StoreWithServicesDto, store, {
+      excludeExtraneousValues: true,
+    });
+  }
+
+  async getServicesByStore(storeId: string): Promise<StoreServiceDto[]> {
+    const services = await this.storeRepo.getServicesByStoreId(storeId);
+
+    return plainToInstance(StoreServiceDto, services, {
       excludeExtraneousValues: true,
     });
   }

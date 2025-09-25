@@ -1,11 +1,12 @@
-import { Body, Controller, Get, Post, Query, UseGuards, Param } from '@nestjs/common';
-import { CreateStoreDto } from './dto/create-store.dto';
-import { GetNearbyDto } from './dto/get-nearby.dto';
-import { StoreService } from './store.service';
-
+import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { Roles } from '../../common/decorator/roles.decorator';
 import { JwtAuthGuard } from '../../common/guard/jwt-auth.guard';
 import { RolesGuard } from '../../common/guard/roles.guard';
+import { CreateStoreDto } from './dto/input/create-store.dto';
+import { GetNearbyDto } from './dto/input/get-nearby.dto';
+import { UpsertStoreServicesDto } from './dto/input/upsert-store_service.dto';
+import { StoreService } from './store.service';
+
 
 @Controller('stores')
 export class StoreController {
@@ -41,5 +42,21 @@ export class StoreController {
   @Get(':id')
   async findById(@Param('id') id: string) {
     return this.storeService.getById(id);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @Post(':storeId/services')
+  async upsertServices(
+    @Param('storeId') storeId: string,
+    @Body() dto: Omit<UpsertStoreServicesDto, 'storeId'>,
+  ) {
+    return this.storeService.upsertServices({ storeId, ...dto });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':storeId/services')
+  async getServicesByStore(@Param('storeId') storeId: string) {
+    return this.storeService.getServicesByStore(storeId);
   }
 }
