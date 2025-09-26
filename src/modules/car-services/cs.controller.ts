@@ -23,6 +23,7 @@ export class ServiceController {
     return this.serviceService.getByCategory(category as ServiceCategory);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Get()
   async getAll() {
     return this.serviceService.getAll();

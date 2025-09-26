@@ -11,8 +11,11 @@ export class BookingService {
     private readonly prisma: PrismaService,
   ) {}
 
-  async create(dto: CreateBookingDto) {
-    const bookingData = BookingTransform.toPrismaInput(dto);
+  async create(dto: CreateBookingDto, userId: string) {
+    const bookingData = BookingTransform.toPrismaInput({
+    ...dto,
+    userId,
+  });
 
     const booking = await this.prisma.$transaction(async (tx) => {
       const created = await this.bookingRepository.create(bookingData);

@@ -5,10 +5,6 @@ export class CreateBookingDto {
   @IsString()
   storeId: string;
 
-  @IsOptional()
-  @IsString()
-  userId?: string;
-
   @IsNotEmpty()
   @IsString()
   @MaxLength(80)

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, Store } from '@prisma/client';
 import { PrismaService } from '../../common/prisma/prisma.service';
+import { ServiceCategory } from '@prisma/client';
 @Injectable()
 export class StoreRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -115,6 +116,20 @@ export class StoreRepository {
   async getServicesByStoreId(storeId: string) {
     return this.prisma.storeService.findMany({
       where: { storeId },
+      include: {
+        service: true,
+      },
+    });
+  }
+
+  async getServicesByStoreIdAndCategory(storeId: string, category: ServiceCategory) {
+    return this.prisma.storeService.findMany({
+      where: {
+        storeId,
+        service: {
+          category,
+        },
+      },
       include: {
         service: true,
       },

@@ -1,24 +1,27 @@
 import { Prisma } from '@prisma/client';
 import { CreateBookingDto } from './create-booking.dto';
 
+export interface CreateBookingInput extends CreateBookingDto {
+  userId: string;
+}
 export class BookingTransform {
-  static toPrismaInput(dto: CreateBookingDto): Prisma.BookingUncheckedCreateInput {
-    const scheduledAt = new Date(`${dto.date}T${dto.time}:00`);
+  static toPrismaInput(input: CreateBookingInput): Prisma.BookingUncheckedCreateInput {
+    const scheduledAt = new Date(`${input.date}T${input.time}:00`);
 
     return {
-      storeId: dto.storeId,
-      userId: dto.userId,
-      name: dto.name,
-      phone: dto.phone,
-      email: dto.email,
-      carModel: dto.carModel,
-      km: dto.km ? parseInt(dto.km, 10) : null,
-      licensePlate: dto.licensePlate,
-      province: dto.province,
-      district: dto.district,
-      locationType: dto.locationType,
+      storeId: input.storeId,
+      userId: input.userId,
+      name: input.name,
+      phone: input.phone,
+      email: input.email,
+      carModel: input.carModel,
+      km: input.km ? parseInt(input.km, 10) : null,
+      licensePlate: input.licensePlate,
+      province: input.province,
+      district: input.district,
+      locationType: input.locationType,
       scheduledAt,
-      notes: dto.notes ?? null,
+      notes: input.notes ?? null,
     };
   }
 }

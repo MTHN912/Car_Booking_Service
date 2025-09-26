@@ -7,6 +7,7 @@ import { NearbyStoreDto } from './dto/response/nearby-store.dto';
 import { StoreListDto } from './dto/response/store-list.dto';
 import { StoreServiceDto, StoreWithServicesDto } from './dto/response/upsert-store-response.dto';
 import { StoreRepository } from './store.repository';
+import { ServiceCategory } from '@prisma/client';
 @Injectable()
 export class StoreService {
   constructor(private readonly storeRepo: StoreRepository) {}
@@ -81,6 +82,17 @@ export class StoreService {
 
   async getServicesByStore(storeId: string): Promise<StoreServiceDto[]> {
     const services = await this.storeRepo.getServicesByStoreId(storeId);
+
+    return plainToInstance(StoreServiceDto, services, {
+      excludeExtraneousValues: true,
+    });
+  }
+
+  async getServicesByStoreAndCategory(
+    storeId: string,
+    category: ServiceCategory,
+  ): Promise<StoreServiceDto[]> {
+    const services = await this.storeRepo.getServicesByStoreIdAndCategory(storeId, category);
 
     return plainToInstance(StoreServiceDto, services, {
       excludeExtraneousValues: true,
