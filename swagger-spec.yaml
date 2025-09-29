@@ -1,0 +1,680 @@
+openapi: 3.0.0
+paths:
+  /auth/register:
+    post:
+      operationId: AuthController_register
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterDto"
+      responses:
+        "201":
+          description: Đăng ký thành công
+        "400":
+          description: Dữ liệu không hợp lệ
+      summary: Đăng ký tài khoản mới
+      tags: &a1
+        - Auth
+  /auth/login:
+    post:
+      operationId: AuthController_login
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginDto"
+      responses:
+        "200":
+          description: Đăng nhập thành công
+        "400":
+          description: Email hoặc mật khẩu sai
+      summary: Đăng nhập hệ thống
+      tags: *a1
+  /auth/refresh:
+    post:
+      operationId: AuthController_refresh
+      parameters: []
+      responses:
+        "200":
+          description: Refresh token thành công
+        "401":
+          description: Refresh token không hợp lệ
+      summary: Làm mới access token
+      tags: *a1
+  /auth/logout:
+    post:
+      operationId: AuthController_logout
+      parameters: []
+      responses:
+        "200":
+          description: Đăng xuất thành công
+        "401":
+          description: Chưa đăng nhập hoặc token không hợp lệ
+      security:
+        - bearer: []
+      summary: Đăng xuất tài khoản
+      tags: *a1
+  /users/me:
+    get:
+      operationId: UsersController_getCurrentUser
+      parameters: []
+      responses:
+        "200":
+          description: Thông tin user hiện tại
+      security: &a2
+        - bearer: []
+      summary: Lấy thông tin người dùng hiện tại
+      tags: &a3
+        - Users
+    patch:
+      operationId: UsersController_updateCurrentUser
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserDto"
+      responses:
+        "200":
+          description: Thông tin user sau khi cập nhật
+        "400":
+          description: Dữ liệu không hợp lệ
+      security: *a2
+      summary: Cập nhật thông tin cá nhân
+      tags: *a3
+  /users/{id}:
+    get:
+      operationId: UsersController_getUserById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thông tin user theo ID
+        "403":
+          description: Không có quyền truy cập
+      security: *a2
+      summary: "Admin: Lấy thông tin người dùng theo ID"
+      tags: *a3
+  /users:
+    get:
+      operationId: UsersController_getAllUsers
+      parameters: []
+      responses:
+        "200":
+          description: Danh sách users
+      security: *a2
+      summary: "Admin: Lấy danh sách tất cả người dùng"
+      tags: *a3
+  /stores:
+    post:
+      operationId: StoreController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateStoreDto"
+      responses:
+        "201":
+          description: Cửa hàng đã được tạo thành công
+      security: &a4
+        - bearer: []
+      summary: "Admin: Tạo cửa hàng mới"
+      tags: &a5
+        - Stores
+    get:
+      operationId: StoreController_findAll
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      security: *a4
+      summary: "Admin: Lấy danh sách tất cả cửa hàng"
+      tags: *a5
+  /stores/nearby:
+    get:
+      operationId: StoreController_findNearby
+      parameters:
+        - name: latitude
+          required: true
+          in: query
+          description: Vĩ độ hiện tại của người dùng
+          schema:
+            example: 10.762622
+            type: number
+        - name: longitude
+          required: true
+          in: query
+          description: Kinh độ hiện tại của người dùng
+          schema:
+            example: 106.660172
+            type: number
+        - name: radius
+          required: true
+          in: query
+          description: Bán kính tìm kiếm (tính bằng mét)
+          schema:
+            example: 5000
+            type: number
+      responses:
+        "200":
+          description: ""
+      security: *a4
+      summary: Tìm cửa hàng gần vị trí hiện tại
+      tags: *a5
+  /stores/by-city:
+    get:
+      operationId: StoreController_findByCity
+      parameters:
+        - name: city
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+      security: *a4
+      summary: Tìm cửa hàng theo thành phố
+      tags: *a5
+  /stores/{id}:
+    get:
+      operationId: StoreController_findById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+      security: *a4
+      summary: Lấy thông tin cửa hàng theo ID
+      tags: *a5
+  /stores/{storeId}/services:
+    post:
+      operationId: StoreController_upsertServices
+      parameters:
+        - name: storeId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "201":
+          description: ""
+      security: *a4
+      summary: "Admin: Thêm hoặc cập nhật dịch vụ của cửa hàng"
+      tags: *a5
+    get:
+      operationId: StoreController_getServicesByStore
+      parameters:
+        - name: storeId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+      security: *a4
+      summary: Lấy tất cả dịch vụ của một cửa hàng
+      tags: *a5
+  /stores/{storeId}/services/category/{category}:
+    get:
+      operationId: StoreController_getServicesByStoreAndCategory
+      parameters:
+        - name: storeId
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: category
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+      security: *a4
+      summary: Lấy dịch vụ theo danh mục một cửa hàng
+      tags: *a5
+  /bookings/{storeId}:
+    post:
+      operationId: BookingController_create
+      parameters:
+        - name: storeId
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBookingDto"
+      responses:
+        "201":
+          description: Booking đã được tạo thành công
+      security: &a6
+        - bearer: []
+      summary: Tạo booking mới cho 1 cửa hàng
+      tags: &a7
+        - Bookings
+  /bookings:
+    get:
+      operationId: BookingController_findAll
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      security: *a6
+      summary: "Admin: Lấy tất cả bookings"
+      tags: *a7
+  /bookings/my:
+    get:
+      operationId: BookingController_findMy
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      security: *a6
+      summary: "Người dùng: Lấy danh sách bookings của chính mình"
+      tags: *a7
+  /bookings/{bookingId}/status:
+    patch:
+      operationId: BookingController_updateStatus
+      parameters:
+        - name: bookingId
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateBookingStatusDto"
+      responses:
+        "200":
+          description: ""
+      security: *a6
+      summary: "Admin: Cập nhật trạng thái booking"
+      tags: *a7
+  /bookings/{bookingId}/cancel:
+    patch:
+      operationId: BookingController_cancelBooking
+      parameters:
+        - name: bookingId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+      security: *a6
+      summary: "Người dùng: Hủy booking của chính mình"
+      tags: *a7
+  /bookings/users:
+    get:
+      operationId: BookingController_findUsersWithBookings
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      security: *a6
+      summary: "Admin: Lấy danh sách người dùng có bookings"
+      tags: *a7
+  /bookings/user/{userId}:
+    get:
+      operationId: BookingController_findByUserId
+      parameters:
+        - name: userId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+      security: *a6
+      summary: "Admin: Lấy tất cả bookings theo userId"
+      tags: *a7
+  /bookings/{bookingId}:
+    get:
+      operationId: BookingController_findById
+      parameters:
+        - name: bookingId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+      security: *a6
+      summary: "Admin: Xem chi tiết booking theo bookingId"
+      tags: *a7
+  /bookings/store/{storeId}:
+    get:
+      operationId: BookingController_findByStoreId
+      parameters:
+        - name: storeId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+      security: *a6
+      summary: "Admin: Lấy danh sách bookings theo storeId"
+      tags: *a7
+  /services:
+    post:
+      operationId: ServiceController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateServiceDto"
+      responses:
+        "201":
+          description: Dịch vụ đã được tạo thành công
+        "400":
+          description: Dữ liệu không hợp lệ
+      security: &a8
+        - bearer: []
+      summary: "Admin: Tạo dịch vụ mới"
+      tags: &a9
+        - Services
+    get:
+      operationId: ServiceController_getAll
+      parameters: []
+      responses:
+        "200":
+          description: Danh sách tất cả dịch vụ
+      security: *a8
+      summary: "Admin: Lấy tất cả dịch vụ"
+      tags: *a9
+  /services/category/{category}:
+    get:
+      operationId: ServiceController_getByCategory
+      parameters:
+        - name: category
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Danh sách dịch vụ theo danh mục
+      security: *a8
+      summary: "Admin: Lấy danh sách dịch vụ theo danh mục"
+      tags: *a9
+info:
+  title: My API
+  description: API description
+  version: "1.0"
+  contact: {}
+tags: []
+servers: []
+components:
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+  schemas:
+    RegisterDto:
+      type: object
+      properties:
+        email:
+          type: string
+          example: newuser@yahoo.com
+          description: Email duy nhất cho tài khoản
+        password:
+          type: string
+          example: password123
+          description: Mật khẩu tối thiểu 6 ký tự
+        name:
+          type: string
+          example: Nguyễn Văn Nguyên
+          description: Tên hiển thị của người dùng
+        gender:
+          type: string
+          example: male
+          description: male hoặc femail
+          enum:
+            - male
+            - female
+        address:
+          type: string
+          example: 123 Đường ABC, Quận Tân An, TP.Kanther
+          description: Địa chỉ của người dùng
+        phoneNumber:
+          type: string
+          example: "0783361874"
+          description: Số điện thoại
+      required:
+        - email
+        - password
+    LoginDto:
+      type: object
+      properties:
+        email:
+          type: string
+          example: user1@example.com
+          description: Địa chỉ email để đăng nhập
+        password:
+          type: string
+          example: "123456"
+          description: Mật khẩu tối thiểu 6 ký tự
+      required:
+        - email
+        - password
+    UpdateUserDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Nguyen Van A
+          description: Tên người dùng
+        gender:
+          type: string
+          example: male
+          description: Giới tính (male hoặc female)
+        address:
+          type: string
+          example: 123 Đường ABC, Quận 1
+          description: Địa chỉ liên hệ
+        phoneNumber:
+          type: string
+          example: "0987654321"
+          description: Số điện thoại người dùng
+    StoreServiceInput:
+      type: object
+      properties:
+        serviceId:
+          type: string
+          example: cmfz2rwsl0000t5gc29o8yt0d
+          description: ID của dịch vụ
+        price:
+          type: number
+          example: 100000
+          description: Giá dịch vụ (VND)
+        duration:
+          type: number
+          example: 60
+          description: Thời lượng dịch vụ (phút)
+      required:
+        - serviceId
+    CreateStoreDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Cửa hàng A
+          description: Tên cửa hàng
+        street:
+          type: string
+          example: 123 Nguyễn Trãi
+          description: Địa chỉ đường
+        ward:
+          type: string
+          example: Phường 1
+          description: Phường/xã
+        city:
+          type: string
+          example: Hồ Chí Minh
+          description: Thành phố
+        latitude:
+          type: number
+          example: 10.762622
+          description: Vĩ độ của cửa hàng
+        longitude:
+          type: number
+          example: 106.660172
+          description: Kinh độ của cửa hàng
+        services:
+          description: Danh sách dịch vụ mà cửa hàng cung cấp
+          example:
+            - serviceId: cmfywcix10009t51sojolt1pj
+              price: 100000
+              duration: 60
+            - serviceId: cmfywbamr0007t51su4j0das0
+              price: 150000
+              duration: 90
+          type: array
+          items:
+            $ref: "#/components/schemas/StoreServiceInput"
+      required:
+        - name
+        - latitude
+        - longitude
+        - services
+    CreateBookingDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Nguyễn Văn A
+          description: Tên khách hàng
+        phone:
+          type: string
+          example: "0912345678"
+          description: Số điện thoại
+        email:
+          type: string
+          example: test@gmail.com
+          description: Email khách hàng
+        carModel:
+          type: string
+          example: Toyota Vios 2020
+          description: Mẫu xe
+        km:
+          type: string
+          example: "15000"
+          description: Số km đã đi
+        licensePlate:
+          type: string
+          example: 51H-123.45
+          description: Biển số xe
+        province:
+          type: string
+          example: TP.HCM
+          description: Tỉnh/Thành phố
+        district:
+          type: string
+          example: Quận 1
+          description: Quận/Huyện
+        locationType:
+          type: string
+          enum:
+            - workshop
+            - mobile
+          example: workshop
+          description: Loại hình đặt lịch
+        date:
+          type: string
+          example: 2025-10-01
+          description: Ngày đặt lịch (YYYY-MM-DD)
+        time:
+          type: string
+          example: 14:00
+          description: Giờ đặt lịch (HH:mm)
+        notes:
+          type: string
+          example: Khách muốn rửa xe trước khi bảo dưỡng
+        services:
+          example:
+            - serviceId1
+            - serviceId2
+          description: Danh sách ID dịch vụ đã chọn
+          type: array
+          items:
+            type: string
+      required:
+        - name
+        - phone
+        - email
+        - carModel
+        - licensePlate
+        - province
+        - district
+        - locationType
+        - date
+        - time
+    UpdateBookingStatusDto:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - PENDING
+            - CONFIRMED
+            - COMPLETED
+            - CANCELLED
+          example: CONFIRMED
+          description: Trạng thái mới của booking
+      required:
+        - status
+    CreateServiceDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Đập phá xe
+          description: Tên dịch vụ
+        description:
+          type: string
+          example: Dịch vụ phá xe trong 30 phút
+          description: Mô tả dịch vụ
+        category:
+          type: string
+          enum:
+            - BASIC
+            - STANDARD
+            - PREMIUM
+          example: BASIC
+          description: Danh mục dịch vụ (BASIC, STANDARD, PREMIUM)
+      required:
+        - name

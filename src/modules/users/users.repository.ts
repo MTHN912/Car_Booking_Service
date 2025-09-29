@@ -28,9 +28,9 @@ export class UsersRepository {
   }
 
   async updateUser(id: string, data: any) {
-  return this.prisma.user.update({
-    where: { id },
-    data,
+    return this.prisma.user.update({
+      where: { id },
+      data,
   });
 }
 
