@@ -3,6 +3,7 @@ import { CreateBookingDto } from './create-booking.dto';
 
 export interface CreateBookingInput extends CreateBookingDto {
   userId: string;
+  storeId: string;
 }
 export class BookingTransform {
   static toPrismaInput(input: CreateBookingInput): Prisma.BookingUncheckedCreateInput {
