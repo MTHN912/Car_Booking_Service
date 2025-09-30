@@ -784,6 +784,20 @@
           "Services"
         ]
       }
+    },
+    "/audit-logs": {
+      "get": {
+        "operationId": "AuditLogController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "AuditLog"
+        ]
+      }
     }
   },
   "info": {

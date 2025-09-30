@@ -430,6 +430,15 @@ paths:
       security: *a8
       summary: "Admin: Lấy danh sách dịch vụ theo danh mục"
       tags: *a9
+  /audit-logs:
+    get:
+      operationId: AuditLogController_findAll
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      tags:
+        - AuditLog
 info:
   title: My API
   description: API description
