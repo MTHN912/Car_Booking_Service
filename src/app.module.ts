@@ -7,6 +7,7 @@ import { BookingModule } from './modules/bookings/bookings.module';
 import { StoreModule } from './modules/store/store.module';
 import { UsersModule } from './modules/users/users.module';
 import { ServicesModule } from './modules/car-services/cs.module';
+import { AuditLogModule } from './modules/audit-logs/audit-logs.module';
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { ServicesModule } from './modules/car-services/cs.module';
     StoreModule,
     RedisModule,
     BookingModule,
-    ServicesModule
+    ServicesModule,
+    AuditLogModule
   ]
 })
 export class AppModule {}
