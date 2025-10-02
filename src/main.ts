@@ -3,14 +3,20 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import { writeFileSync } from 'fs';
+import helmet from 'helmet';
 import * as YAML from 'yaml';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/exception-filter/all.exception.filter';
 import { TransformInterceptor } from './common/interceptor/transform.interceptor';
 
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.use(
+    helmet(),
+  );
+  
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
